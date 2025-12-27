@@ -3,99 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radiator Blues - Engine</title>
+    <title>The Okie Migration: Dust Bowl Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+        
+        :root {
+            --sepia-dark: #3e2723;
+            --sepia-mid: #795548;
+            --sepia-light: #d7ccc8;
+            --dust: #bcaaa4;
+        }
+
         body {
-            background-color: #1a1512;
-            color: #d4c4a8;
-            font-family: 'Courier Prime', monospace;
-            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            background-color: var(--sepia-dark);
+            color: var(--sepia-light);
+            font-family: 'Special+Elite', 'Courier New', Courier, monospace;
+            background-image: url('https://www.transparenttextures.com/patterns/felt.png');
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .vintage-border {
-            border: 2px solid #5c4a3c;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+
+        #game-container {
+            width: 95%;
+            max-width: 800px;
+            height: 90vh;
+            background: var(--sepia-light);
+            color: var(--sepia-dark);
+            border: 12px solid var(--sepia-mid);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
-        .typewriter {
-            font-family: 'Special Elite', cursive;
+
+        .crt-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 10;
         }
-        .stat-card {
-            background: rgba(45, 38, 32, 0.8);
-            border-bottom: 2px solid #3d3329;
+
+        .stat-bar {
+            height: 8px;
+            background: #a1887f;
+            border-radius: 4px;
+            overflow: hidden;
         }
-        .btn-choice {
+
+        .stat-fill {
+            height: 100%;
+            background: var(--sepia-dark);
+            transition: width 0.5s ease;
+        }
+
+        .terminal-text {
+            border-right: 2px solid var(--sepia-dark);
+            animation: blink 0.75s step-end infinite;
+        }
+
+        @keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--sepia-dark) } }
+        
+        .choice-btn {
+            border: 2px solid var(--sepia-dark);
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid #5c4a3c;
-            background: #2d2620;
+            text-align: left;
         }
-        .btn-choice:hover:not(:disabled) {
-            background: #d4c4a8;
-            color: #1a1512;
-            transform: translateX(5px);
+
+        .choice-btn:hover {
+            background: var(--sepia-dark);
+            color: var(--sepia-light);
         }
-        .btn-choice:disabled {
+
+        .choice-btn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
-            text-decoration: line-through;
         }
-        .progress-bar {
-            height: 4px;
-            background: #3d3329;
-            width: 100%;
+
+        #log {
+            scrollbar-width: thin;
+            scrollbar-color: var(--sepia-mid) transparent;
         }
-        .progress-fill {
-            height: 100%;
-            background: #8b4513;
-            transition: width 0.5s ease-in-out;
-        }
-        #terminal-log::-webkit-scrollbar { width: 4px; }
-        #terminal-log::-webkit-scrollbar-thumb { background: #5c4a3c; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-4 md:p-8">
-
-    <!-- Header / Stats Bar -->
-    <header id="stats-bar" class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-6">
-        <!-- Stats populated by engine.js -->
-    </header>
-
-    <main class="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
+<body>
+    <div id="game-container">
+        <div class="crt-overlay"></div>
         
-        <!-- Left Column: Visuals & Narrative -->
-        <section class="lg:col-span-2 flex flex-col gap-4">
-            <div class="vintage-border aspect-video bg-black flex items-center justify-center overflow-hidden relative">
-                <div id="scene-image" class="absolute inset-0 opacity-40 bg-center bg-cover transition-all duration-1000"></div>
-                <h2 id="scene-title" class="typewriter text-3xl md:text-5xl text-center z-10 px-4">Loading Engine...</h2>
-            </div>
-            
-            <div id="narrative-box" class="vintage-border p-6 bg-[#261f1a] flex-grow text-lg leading-relaxed overflow-y-auto max-h-[400px]">
-                <p id="scene-description">Scanning manifest.json...</p>
-            </div>
-        </section>
+        <!-- Header / Stats -->
+        <div id="stats-panel" class="p-4 border-b-2 border-sepia-mid grid grid-cols-2 md:grid-cols-4 gap-4 bg-stone-200">
+            <!-- Dynamic Stats injected here -->
+        </div>
 
-        <!-- Right Column: Choices & Log -->
-        <section class="flex flex-col gap-4">
-            <div class="flex flex-col gap-2">
-                <h3 class="uppercase text-xs font-bold tracking-widest text-[#8b7355] mb-2">Decision Matrix</h3>
-                <div id="choice-container" class="flex flex-col gap-3">
-                    <!-- Choices populated by engine.js -->
-                </div>
+        <!-- Main Viewport -->
+        <div class="flex-1 overflow-y-auto p-6 flex flex-col" id="viewport">
+            <div id="location-display" class="text-xs uppercase tracking-widest mb-2 opacity-60"></div>
+            <div id="narrative-text" class="text-xl mb-8 leading-relaxed">
+                Loading manifest...
             </div>
-
-            <div class="flex-grow flex flex-col mt-4">
-                <h3 class="uppercase text-xs font-bold tracking-widest text-[#8b7355] mb-2">Migration Log</h3>
-                <div id="terminal-log" class="bg-black p-3 text-sm font-mono text-green-800 h-40 overflow-y-auto vintage-border opacity-70">
-                    <div>[SYSTEM] Engine initialized...</div>
-                    <div>[SYSTEM] Awaiting data packets...</div>
-                </div>
+            <div id="choices-container" class="mt-auto">
+                <!-- Buttons injected here -->
             </div>
-        </section>
-    </main>
+        </div>
 
-    <footer class="mt-6 text-center text-xs opacity-50 uppercase tracking-tighter">
-        Radiator Blues v1.0 | Data-Driven Simulation | Great Depression VUS.10d
-    </footer>
+        <!-- Footer -->
+        <div class="p-2 bg-stone-300 text-[10px] flex justify-between border-t border-sepia-mid">
+            <span>OKIE_ENGINE_V1.0</span>
+            <span id="distance-tracker">0 MILES TO CALIFORNIA</span>
+        </div>
+    </div>
 
     <script>
         /**
@@ -103,155 +128,203 @@
          */
         class GameEngine {
             constructor() {
-                this.state = {
-                    resources: {},
-                    flags: [],
-                    currentSceneId: null,
-                    totalMiles: 0
-                };
-                this.db = {
-                    config: {},
+                this.manifest = null;
+                this.data = {
+                    stats: {},
                     events: {},
-                    scenes: {}
+                    locations: []
+                };
+                this.gameState = {
+                    currentLocationIndex: 0,
+                    currentDistance: 0,
+                    stats: {},
+                    activeEvent: null,
+                    isGameOver: false,
+                    log: []
+                };
+
+                this.elements = {
+                    stats: document.getElementById('stats-panel'),
+                    narrative: document.getElementById('narrative-text'),
+                    choices: document.getElementById('choices-container'),
+                    location: document.getElementById('location-display'),
+                    distance: document.getElementById('distance-tracker')
                 };
             }
 
             async init() {
                 try {
-                    this.log("Fetching manifest...");
+                    // 1. Fetch Manifest
                     const manifestRes = await fetch('manifest.json');
-                    const manifest = await manifestRes.json();
+                    this.manifest = await manifestRes.json();
 
-                    this.log(`Loading ${manifest.files.length} content files...`);
-                    
-                    const loadPromises = manifest.files.map(file => 
-                        fetch(file).then(res => res.json())
+                    // 2. Fetch all content files listed in manifest
+                    const loadPromises = this.manifest.files.map(url => 
+                        fetch(url).then(res => res.json())
                     );
+                    const contents = await Promise.all(loadPromises);
 
-                    const dataBlocks = await Promise.all(loadPromises);
-                    
-                    // Merge data into registry
-                    dataBlocks.forEach(block => {
-                        if (block.type === 'config') this.db.config = block.data;
-                        if (block.type === 'events') {
-                            block.data.forEach(e => this.db.events[e.id] = e);
-                        }
+                    // 3. Merge data into engine memory
+                    contents.forEach(content => {
+                        if (content.stats) Object.assign(this.data.stats, content.stats);
+                        if (content.events) Object.assign(this.data.events, content.events);
+                        if (content.locations) this.data.locations = content.locations;
                     });
 
-                    this.setupInitialState();
-                    this.render();
-                    this.startJourney(this.db.config.start_event);
-
+                    this.setupGame();
                 } catch (err) {
-                    this.log(`CRITICAL ERROR: ${err.message}`, 'red');
-                    document.getElementById('scene-title').innerText = "SYSTEM FAILURE";
-                    document.getElementById('scene-description').innerText = "Failed to load game data. Check manifest and JSON formatting.";
+                    console.error("Initialization Failed:", err);
+                    this.elements.narrative.innerHTML = "Critical Error: Manifest or data files missing. Check console.";
                 }
             }
 
-            setupInitialState() {
-                this.state.resources = { ...this.db.config.initial_resources };
-                this.state.currentSceneId = this.db.config.start_event;
-                this.log("State synchronized.");
-            }
-
-            log(msg, color = 'green') {
-                const logEl = document.getElementById('terminal-log');
-                const entry = document.createElement('div');
-                entry.style.color = color;
-                entry.textContent = `> ${msg}`;
-                logEl.appendChild(entry);
-                logEl.scrollTop = logEl.scrollHeight;
-            }
-
-            checkRequirements(reqs) {
-                if (!reqs) return true;
-                return Object.entries(reqs).every(([stat, min]) => this.state.resources[stat] >= min);
-            }
-
-            applyEffects(effects) {
-                if (!effects) return;
-                Object.entries(effects).forEach(([stat, delta]) => {
-                    if (this.state.resources.hasOwnProperty(stat)) {
-                        const oldVal = this.state.resources[stat];
-                        this.state.resources[stat] = Math.max(0, this.state.resources[stat] + delta);
-                        const diff = this.state.resources[stat] - oldVal;
-                        this.log(`${stat.toUpperCase()} ${diff >= 0 ? '+' : ''}${diff}`);
-                    }
-                });
-            }
-
-            startJourney(eventId) {
-                const event = this.db.events[eventId];
-                if (!event) {
-                    this.log(`Event ${eventId} not found!`, 'red');
-                    return;
+            setupGame() {
+                // Initialize state from data definitions
+                for (let key in this.data.stats) {
+                    this.gameState.stats[key] = this.data.stats[key].initial;
                 }
-
-                this.state.currentSceneId = eventId;
                 
-                // DOM Updates
-                document.getElementById('scene-title').innerText = event.title;
-                document.getElementById('scene-description').innerHTML = event.narrative;
-                document.getElementById('scene-image').style.backgroundImage = `url(${event.image || ''})`;
-                
-                this.renderChoices(event.choices);
-                this.renderStats();
+                // Start at first location
+                this.render();
             }
 
-            renderChoices(choices) {
-                const container = document.getElementById('choice-container');
-                container.innerHTML = '';
-
-                choices.forEach(choice => {
-                    const btn = document.createElement('button');
-                    const canAfford = this.checkRequirements(choice.requirements);
-                    
-                    btn.className = "btn-choice p-4 text-left text-sm uppercase font-bold flex justify-between items-center";
-                    btn.disabled = !canAfford;
-                    
-                    let reqText = "";
-                    if (choice.requirements) {
-                        reqText = Object.entries(choice.requirements)
-                            .map(([k, v]) => ` [Need ${v} ${k}]`).join("");
-                    }
-
-                    btn.innerHTML = `<span>${choice.text}</span> <span class="text-[10px] opacity-50">${reqText}</span>`;
-                    
-                    btn.onclick = () => {
-                        this.log(`Action: ${choice.text}`);
-                        this.applyEffects(choice.effects);
-                        
-                        if (choice.flavor_text) {
-                            // Temporary "result" screen logic could go here
-                            this.log(choice.flavor_text, '#d4c4a8');
-                        }
-
-                        if (choice.next_event) {
-                            this.startJourney(choice.next_event);
-                        }
-                    };
-                    container.appendChild(btn);
-                });
-            }
-
-            renderStats() {
-                const bar = document.getElementById('stats-bar');
-                bar.innerHTML = '';
-                
-                Object.entries(this.state.resources).forEach(([key, val]) => {
-                    const div = document.createElement('div');
-                    div.className = "stat-card p-2 flex flex-col items-center justify-center";
-                    div.innerHTML = `
-                        <span class="text-[10px] uppercase opacity-60">${key}</span>
-                        <span class="text-xl font-bold ${val < 5 ? 'text-red-500 animate-pulse' : ''}">${val}</span>
-                    `;
-                    bar.appendChild(div);
-                });
-            }
-
+            // Central rendering logic based on data types
             render() {
-                // Main render loop if needed for animations
+                this.updateStatsUI();
+                
+                const loc = this.data.locations[this.gameState.currentLocationIndex];
+                this.elements.location.innerText = loc.name;
+                this.elements.distance.innerText = `${loc.milesToNext || 0} MILES TO NEXT STOP`;
+
+                if (this.gameState.activeEvent) {
+                    this.displayEvent(this.gameState.activeEvent);
+                } else {
+                    this.displayLocation(loc);
+                }
+            }
+
+            updateStatsUI() {
+                this.elements.stats.innerHTML = '';
+                for (let key in this.gameState.stats) {
+                    const val = this.gameState.stats[key];
+                    const meta = this.data.stats[key];
+                    
+                    const statDiv = document.createElement('div');
+                    statDiv.className = 'flex flex-col';
+                    statDiv.innerHTML = `
+                        <div class="flex justify-between text-[10px] font-bold uppercase mb-1">
+                            <span>${meta.label}</span>
+                            <span>${val}${meta.unit || ''}</span>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill" style="width: ${(val / meta.max) * 100}%"></div>
+                        </div>
+                    `;
+                    this.elements.stats.appendChild(statDiv);
+                }
+            }
+
+            displayLocation(loc) {
+                this.elements.narrative.innerHTML = loc.description;
+                this.elements.choices.innerHTML = '';
+                
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn w-full font-bold uppercase tracking-tighter bg-stone-800 text-stone-100';
+                btn.innerText = "Begin the next leg of the journey";
+                btn.onclick = () => this.travel();
+                this.elements.choices.appendChild(btn);
+            }
+
+            displayEvent(event) {
+                this.elements.narrative.innerHTML = event.text;
+                this.elements.choices.innerHTML = '';
+
+                event.choices.forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn w-full';
+                    
+                    // Check requirements
+                    let canPick = true;
+                    if (choice.requirements) {
+                        for (let s in choice.requirements) {
+                            if (this.gameState.stats[s] < choice.requirements[s]) canPick = false;
+                        }
+                    }
+
+                    btn.disabled = !canPick;
+                    btn.innerHTML = choice.label;
+                    if (!canPick) btn.innerHTML += " <span class='text-[10px] opacity-50'>(Not enough resources)</span>";
+                    
+                    btn.onclick = () => this.handleChoice(choice);
+                    this.elements.choices.appendChild(btn);
+                });
+            }
+
+            handleChoice(choice) {
+                // Apply effects
+                if (choice.effects) {
+                    for (let s in choice.effects) {
+                        this.gameState.stats[s] = Math.max(0, Math.min(this.data.stats[s].max, this.gameState.stats[s] + choice.effects[s]));
+                    }
+                }
+
+                // Check for follow-up event or clear event
+                if (choice.nextEvent) {
+                    this.gameState.activeEvent = this.data.events[choice.nextEvent];
+                } else {
+                    this.gameState.activeEvent = null;
+                }
+
+                this.checkGameOver();
+                this.render();
+            }
+
+            travel() {
+                const loc = this.data.locations[this.gameState.currentLocationIndex];
+                
+                // Consume resources
+                this.gameState.stats.gas -= 5;
+                this.gameState.stats.food -= 2;
+                this.gameState.stats.health -= 1;
+
+                // Random event check (30% chance)
+                if (Math.random() < 0.4) {
+                    const eventIds = Object.keys(this.data.events).filter(id => !this.data.events[id].storyOnly);
+                    const randomId = eventIds[Math.floor(Math.random() * eventIds.length)];
+                    this.gameState.activeEvent = this.data.events[randomId];
+                } else {
+                    // Move to next location
+                    this.gameState.currentLocationIndex++;
+                    if (this.gameState.currentLocationIndex >= this.data.locations.length) {
+                        this.win();
+                        return;
+                    }
+                }
+
+                this.checkGameOver();
+                this.render();
+            }
+
+            checkGameOver() {
+                if (this.gameState.stats.health <= 0) {
+                    this.endGame("Your family could not endure the journey. You succumb to illness and exhaustion in the red dirt of New Mexico.");
+                } else if (this.gameState.stats.gas <= 0 && this.gameState.stats.money <= 0) {
+                    this.endGame("The Jalopy has breathed its last, and your pockets are empty. You are stranded in the wasteland.");
+                }
+            }
+
+            endGame(msg) {
+                this.gameState.activeEvent = {
+                    text: `<span class='text-red-800 font-bold'>GAME OVER</span><br><br>${msg}`,
+                    choices: [{ label: "Try Again", effects: null, nextEvent: null, action: () => window.location.reload() }]
+                };
+            }
+
+            win() {
+                this.gameState.activeEvent = {
+                    text: "<span class='text-green-800 font-bold'>CALIFORNIA</span><br><br>The green valleys of San Joaquin stretch out before you. The journey was long and the cost was high, but you've arrived.",
+                    choices: [{ label: "Credits", effects: null, nextEvent: null }]
+                };
             }
         }
 
