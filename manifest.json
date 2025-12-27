@@ -1,6 +1,9 @@
 {
+  "name": "Dust Bowl: Okie Migration",
+  "version": "1.0.0",
   "files": [
-    "content_config.json",
-    "content_events.json"
+    "data_stats.json",
+    "data_locations.json",
+    "data_events.json"
   ]
 }
